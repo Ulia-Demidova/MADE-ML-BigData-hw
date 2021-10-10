@@ -1,0 +1,43 @@
+Создайте папку в корневой HDFS-папке
+    hdfs dfs -mkdir /my_dir
+
+Создайте в созданной папке новую вложенную папку
+	hdfs dfs -mkdir /my_dir/subdir
+
+Как сделать так, чтобы файлы удалялись сразу, минуя “Trash”?
+	hdfs dfs -rm -skipTrash <file>
+
+Создайте пустой файл в подпапке из пункта 2.
+	hdfs dfs -touchz /my_dir/subdir/file.txt
+
+Удалите созданный файл.
+	hdfs dfs -rm -skipTrash /my_dir/subdir/file
+
+Удалите созданные папки.
+	hdfs dfs -rm -r -skipTrash /my_dir
+
+Скопируйте любой в новую папку на HDFS
+	hdfs dfs -mkdir /my_dir
+	hdfs dfs -put file /my_dir/
+
+Выведите содержимое HDFS-файла на экран.
+	hdfs dfs -cat /my_dir/file
+
+Выведите содержимое нескольких последних строчек HDFS-файла на экран.
+	hdfs dfs -tail /my_dir/file
+
+Выведите содержимое нескольких первых строчек HDFS-файла на экран.
+	hdfs dfs -cat /my_dir/file | head
+
+Переместите копию файла в HDFS на новую локацию.
+	hdfs dfs -cp /my_dir/file /my_dir_2
+
+Изменить replication factor для файла. Как долго занимает время на увеличение / уменьшение числа реплик для файла?
+ (Увеличение очень долго, уменьшение практически мгновенно)
+	hdfs dfs -setrep -w 3 /my_dir/file
+
+Найдите информацию по файлу, блокам и их расположениям с помощью “hdfs fsck”
+	hdfs fsck /my_dir/file -files -blocks -locations
+
+Получите информацию по любому блоку из п.2
+	hdfs fsck -blockId blk_1073741964
