@@ -1,1 +1,0 @@
-Homeworks for MADE course ML on Big Data.
