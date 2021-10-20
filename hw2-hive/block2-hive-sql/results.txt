@@ -1,0 +1,69 @@
+1) Исполнитель с максимальным числом скробблов:
+    select artist_lastfm
+    from (
+           select artist_lastfm, scrobbles_lastfm
+           from artists
+           order by scrobbles_lastfm desc
+           limit 1) as tmp;
+
+    Результат: The Beatles
+
+2) Самый популярный тэг на ластфм:
+    select tag
+    from (
+           select tag, count(*) as cnt
+           from (select explode(split(tags_lastfm, '; ')) as tag
+                 from artists) as b
+           where tag != ''
+           group by tag
+           order by cnt desc
+           limit 1) as tmp;
+
+    Результат: seen live
+
+3) Самые популярные исполнители 10 самых популярных тегов ластфм (для каждого из популярных тегов нашла самого
+популярного исполнителя и вывела список уникальных):
+    select distinct artist_lastfm
+    from (
+           select tag
+                , artist_lastfm
+                , listeners_lastfm
+                , row_number() over (partition by tag order by listeners_lastfm desc) as num
+           from (
+                  select artist_lastfm, tag, listeners_lastfm
+                  from artists
+                         lateral view explode(split(tags_lastfm, '; ')) adTable as tag
+                ) as d
+           where tag in
+                 (
+                   select tag
+                   from (
+                          select tag, count(*) as cnt
+                          from (
+                                 select explode(split(tags_lastfm, '; ')) as tag
+                                 from artists
+                               ) as b
+                          where tag != ''
+                          group by tag
+                          order by cnt desc
+                          limit 10
+                        ) as c
+                 )
+         ) as tmp
+    where num = 1;
+
+    Результат: Coldplay, Diddy - Dirty Money, Jason Derülo, Radiohead, Rihanna
+
+4) Топ 10 стран с максимальным количеством артистов:
+    select country
+    from (
+           select country, count(artist_lastfm) as cnt
+           from (select artist_lastfm, country
+                 from artists
+                        lateral view explode(split(country_lastfm, '; ')) adTable as country
+                 where country != '') as tmp
+           group by country
+           order by cnt desc
+           limit 10) as tmp2;
+
+    Результат: United States, United Kingdom, Germany, Japan, France, Sweden, Russia, Italy, Canada, Spain
